@@ -51,10 +51,10 @@ async function uploadManifestToS3(parameters) {
   try {
     const s3Client = new S3Client({
       region: config.AWS_REGION,
-      credentials: {
-        accessKeyId: config.S3_ACCESS_KEY_ID,
-        secretAccessKey: config.S3_SECRET_ACCESS_KEY,
-      },
+      // credentials: {
+      //   accessKeyId: config.S3_ACCESS_KEY_ID,
+      //   secretAccessKey: config.S3_SECRET_ACCESS_KEY,
+      // },
     });
     
     //convert body into a CSV file
