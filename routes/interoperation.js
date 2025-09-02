@@ -78,12 +78,12 @@ async function uploadManifestToS3(parameters) {
         });}
       catch (e){
         console.log('Failed to Write to file , Malformed data ')
-          return getSignedUrl({
-            url: `Failed to Write to file , Malformed data `,
-            dateLessThan: new Date(
-              Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-            ),
-        });
+        //   return getSignedUrl({
+        //     url: `Failed to Write to file , Malformed data `,
+        //     dateLessThan: new Date(
+        //       Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
+        //     ),
+        // });
       }
     
     }
@@ -102,13 +102,15 @@ async function uploadManifestToS3(parameters) {
     try {
     await s3Client.send(uploadCommand)
     }
-    catch{
-      return getSignedUrl({
-        url: `S3 failed connect `,
-        dateLessThan: new Date(
-          Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-        ),
-    });
+   catch (e){
+        console.log('Failed send file to s3 ', e);
+        console.error('Failed send file to s3 ', e);
+    //   return getSignedUrl({
+    //     url: `S3 failed connect `,
+    //     dateLessThan: new Date(
+    //       Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
+    //     ),
+    // });
 
     }
     console.log("config")
@@ -125,13 +127,14 @@ async function uploadManifestToS3(parameters) {
       ),
     });
   } catch (error) {
+    console.log('Failed getSignedUrl from cloudfront ', error);
     console.error(error);
-    return getSignedUrl({
-      url: 'code exits uploadManifestToS3' + error,
-      dateLessThan: new Date(
-        Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-      ),
-  });
+  //   return getSignedUrl({
+  //     url: 'code exits uploadManifestToS3' + error,
+  //     dateLessThan: new Date(
+  //       Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
+  //     ),
+  // });
   }
 }
 
