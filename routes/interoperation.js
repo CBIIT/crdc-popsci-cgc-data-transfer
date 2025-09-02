@@ -62,11 +62,13 @@ async function uploadManifestToS3(parameters) {
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     try {
-    await fs.writeFile(tempCsvFilePath, manifestCsv, {
-      encoding: "utf-8",
-    });
+        console.log("write File to temp dir")
+        console.log(tempCsvFilePath)
+        console.log(manifestCsv)
+        await fs.writeFile(tempCsvFilePath, manifestCsv, {
+          encoding: "utf-8",
+        });
     } catch (e){
-      
       try{
         const manifestCsvTry = JSON.stringify(parameters.manifest)
         console.log(parameters.manifest)
@@ -95,8 +97,9 @@ async function uploadManifestToS3(parameters) {
     const uploadCommand = new PutObjectCommand(uploadParams);
     //upload CSV
     console.log('Sending upload to S3Client')
+    console.log(config.FILE_MANIFEST_BUCKET_NAME)
     try {
-    await s3Client.send(uploadCommand);
+    await s3Client.send(uploadCommand)
     }
     catch{
       return getSignedUrl({
