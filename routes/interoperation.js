@@ -39,13 +39,7 @@ router.post('/get-manifest-file-signed-url', async function(req, res, next) {
     });
   } catch (error) {
     console.error(error);
-    if (error instanceof SomeSpecificError) {
-      console.log('Invalid manifest data format.')
-      return res.status(400).send({
-        error: 'Bad Request',
-        message: 'Invalid manifest data format.'
-      });
-    } else if (error instanceof AuthenticationError) {
+  if (error instanceof AuthenticationError) {
       console.log('Authentication failed, please check your credentials.')
       return res.status(401).send({
         error: 'Unauthorized',
@@ -123,6 +117,7 @@ async function uploadManifestToS3(parameters) {
     }
     //Return signed URL for CSV
     console.log('returning Signed URL')
+    console.log(config)
     return getSignedUrl({
       keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
       privateKey: config.CLOUDFRONT_PRIVATE_KEY,
