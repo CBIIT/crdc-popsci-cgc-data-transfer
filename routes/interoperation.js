@@ -98,6 +98,7 @@ async function uploadManifestToS3(parameters) {
     //upload CSV
     console.log('Sending upload to S3Client')
     console.log(config.FILE_MANIFEST_BUCKET_NAME)
+    console.log(uploadCommand)
     try {
     await s3Client.send(uploadCommand)
     }
