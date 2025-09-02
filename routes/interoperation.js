@@ -107,9 +107,11 @@ async function uploadManifestToS3(parameters) {
     });
 
     }
-    //Return signed URL for CSV
-    console.log('returning Signed URL')
+    console.log("config")
     console.log(config)
+    console.log("config.CLOUDFRONT_DOMAIN")
+    console.log(config.CLOUDFRONT_DOMAIN)
+    console.log('returning Signed URL')
     return getSignedUrl({
       keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
       privateKey: config.CLOUDFRONT_PRIVATE_KEY,
