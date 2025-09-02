@@ -38,20 +38,12 @@ router.post('/get-manifest-file-signed-url', async function(req, res, next) {
       manifestSignedUrl: response
     });
   } catch (error) {
-    console.error(error);
-  if (error instanceof AuthenticationError) {
-      console.log('Authentication failed, please check your credentials.')
-      return res.status(401).send({
-        error: 'Unauthorized',
-        message: 'Authentication failed, please check your credentials.'
-      });
-    } else {
+      console.error(error);
       console.log('An unknown error occurred while processing the request.')
       return res.status(500).send({
         error: 'Internal Server Error',
         message: error.message || 'An unknown error occurred while processing the request.'
       });
-    }
   }
 });
 
