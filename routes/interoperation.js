@@ -63,21 +63,20 @@ async function uploadManifestToS3(parameters) {
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     try {
         console.log("write File to temp dir")
-        console.log(tempCsvFilePath)
-        console.log(manifestCsv)
         await fs.writeFile(tempCsvFilePath, manifestCsv, {
           encoding: "utf-8",
         });
     } catch (e){
+        console.log("Failed to write File to temp dir")
       try{
-        const manifestCsvTry = JSON.stringify(parameters.manifest)
-        console.log(parameters.manifest)
+        
         console.log('Attempting to Stringify data')
+        const manifestCsvTry = JSON.stringify(parameters.manifest)
         await fs.writeFile(tempCsvFilePath, manifestCsvTry, {
           encoding: "utf-8",
         });}
       catch (e){
-        console.log('Failed to Write to file , Malformed data ')
+        console.log('Failed to Write to file , Malformed data ', e)
         //   return getSignedUrl({
         //     url: `Failed to Write to file , Malformed data `,
         //     dateLessThan: new Date(
@@ -98,7 +97,6 @@ async function uploadManifestToS3(parameters) {
     //upload CSV
     console.log('Sending upload to S3Client')
     console.log(config.FILE_MANIFEST_BUCKET_NAME)
-    console.log(uploadCommand)
     try {
     await s3Client.send(uploadCommand)
     }
@@ -111,12 +109,7 @@ async function uploadManifestToS3(parameters) {
     //       Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
     //     ),
     // });
-
     }
-    console.log("config")
-    console.log(config)
-    console.log("config.CLOUDFRONT_DOMAIN")
-    console.log(config.CLOUDFRONT_DOMAIN)
     console.log('returning Signed URL')
     return getSignedUrl({
       keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
