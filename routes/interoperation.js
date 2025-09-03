@@ -38,26 +38,12 @@ router.post('/get-manifest-file-signed-url', async function(req, res, next) {
       manifestSignedUrl: response
     });
   } catch (error) {
-    console.error(error);
-    if (error instanceof SomeSpecificError) {
-      console.log('Invalid manifest data format.')
-      return res.status(400).send({
-        error: 'Bad Request',
-        message: 'Invalid manifest data format.'
-      });
-    } else if (error instanceof AuthenticationError) {
-      console.log('Authentication failed, please check your credentials.')
-      return res.status(401).send({
-        error: 'Unauthorized',
-        message: 'Authentication failed, please check your credentials.'
-      });
-    } else {
+      console.error(error);
       console.log('An unknown error occurred while processing the request.')
       return res.status(500).send({
         error: 'Internal Server Error',
         message: error.message || 'An unknown error occurred while processing the request.'
       });
-    }
   }
 });
 
@@ -65,10 +51,6 @@ async function uploadManifestToS3(parameters) {
   try {
     const s3Client = new S3Client({
       region: config.AWS_REGION,
-      credentials: {
-        accessKeyId: config.S3_ACCESS_KEY_ID,
-        secretAccessKey: config.S3_SECRET_ACCESS_KEY,
-      },
     });
     
     //convert body into a CSV file
@@ -76,26 +58,21 @@ async function uploadManifestToS3(parameters) {
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     try {
-    await fs.writeFile(tempCsvFilePath, manifestCsv, {
-      encoding: "utf-8",
-    });
+        console.log("write File to temp dir")
+        await fs.writeFile(tempCsvFilePath, manifestCsv, {
+          encoding: "utf-8",
+        });
     } catch (e){
-      
+        console.log("Failed to write File to temp dir")
       try{
-        const manifestCsvTry = JSON.stringify(parameters.manifest)
-        console.log(parameters.manifest)
+        
         console.log('Attempting to Stringify data')
+        const manifestCsvTry = JSON.stringify(parameters.manifest)
         await fs.writeFile(tempCsvFilePath, manifestCsvTry, {
           encoding: "utf-8",
         });}
       catch (e){
-        console.log('Failed to Write to file , Malformed data ')
-          return getSignedUrl({
-            url: `Failed to Write to file , Malformed data `,
-            dateLessThan: new Date(
-              Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-            ),
-        });
+        console.log('Failed to Write to file , Malformed data ', e)
       }
     
     }
@@ -109,19 +86,15 @@ async function uploadManifestToS3(parameters) {
     const uploadCommand = new PutObjectCommand(uploadParams);
     //upload CSV
     console.log('Sending upload to S3Client')
+    console.log(config.FILE_MANIFEST_BUCKET_NAME)
     try {
-    await s3Client.send(uploadCommand);
+    await s3Client.send(uploadCommand)
     }
-    catch{
-      return getSignedUrl({
-        url: `S3 failed connect `,
-        dateLessThan: new Date(
-          Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-        ),
-    });
+   catch (e){
+        console.log('Failed send file to s3 ', e);
+        console.error('Failed send file to s3 ', e);
 
     }
-    //Return signed URL for CSV
     console.log('returning Signed URL')
     return getSignedUrl({
       keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
@@ -132,13 +105,8 @@ async function uploadManifestToS3(parameters) {
       ),
     });
   } catch (error) {
+    console.log('Failed getSignedUrl from cloudfront ', error);
     console.error(error);
-    return getSignedUrl({
-      url: 'code exits uploadManifestToS3' + error,
-      dateLessThan: new Date(
-        Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
-      ),
-  });
   }
 }
 
