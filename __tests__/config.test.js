@@ -4,7 +4,7 @@ jest.mock("dotenv", () => ({
   config: jest.fn(), // don't actually read .env during tests
 }));
 
-const CONFIG_PATH = "../config.js"; // explicit, since file is config.js
+const CONFIG_PATH = "../config.js";
 
 function baseRequiredEnv(overrides = {}) {
   return {
