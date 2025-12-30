@@ -3,7 +3,7 @@
 
 ## Purpose
 
-This microservice supports interoperability between the Population Science Data Commons(PSDC) and Cancer Genomics Cloud (CGC) to enable secure sharing of file manifest data. It acts as a bridge service that:
+This microservice supports interoperability between the Population Science Data Commons (PSDC) and Cancer Genomics Cloud (CGC) to enable secure sharing of file manifest data. It acts as a bridge service that:
 
 - **Receives manifest data** - Accepts CSV manifest files containing file metadata/listings from PSDC
 - **Stores manifests in S3** - Uploads the manifest to an AWS S3 bucket with a unique filename
