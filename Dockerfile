@@ -1,4 +1,6 @@
-FROM node:22.20.0-alpine AS fnl_base_image
+#FROM node:22.20.0-alpine AS fnl_base_image
+FROM node:22.22.0-alpine3.23 AS fnl_base_image
+
 ENV PORT 4030
 ENV NODE_ENV production
 WORKDIR /usr/src/app
