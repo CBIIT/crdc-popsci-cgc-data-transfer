@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 # Use npm ci to install exact versions from package-lock.json (respects overrides for security fixes)
 # --omit=dev excludes devDependencies (jest, nodemon, etc.) for smaller production image
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev && rm -f package*.json
 COPY  --chown=node:node . .
 EXPOSE 4030
 CMD [ "node", "./bin/www" ]
