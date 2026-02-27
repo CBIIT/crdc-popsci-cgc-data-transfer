@@ -34,9 +34,16 @@
     "supertest": "^7.1.4"
   },
   "overrides": {
-    "fast-xml-parser": ">=5.3.8"
+    "fast-xml-parser": "^5.3.8",
+    "glob": "^11.1.0",
+    "minimatch": "^10.2.3",
+    "tar": "^7.5.8"
   },
   "comments": {
-    "overrides": "Forces fast-xml-parser to v5.3.8+ to fix CVE-2026-27942 (Buffer Overflow) in transitive dependency from @aws-sdk/client-s3"
+    "overrides": "Security vulnerability fixes for transitive dependencies",
+    "fast-xml-parser": "CVE-2026-27942 (CVSS 6.9) - Buffer Overflow vulnerability in XMLBuilder when preserveOrder:true is set. Transitive dependency from @aws-sdk/client-s3 -> @aws-sdk/xml-builder. Fixed in v5.3.8+",
+    "glob": "CVE-2025-64756 (HIGH) - Command Injection vulnerability via malicious filenames. Fixed in v11.1.0+",
+    "minimatch": "Multiple CVEs (HIGH) - CVE-2026-26996, CVE-2026-27903, CVE-2026-27904: Denial of Service via specially crafted glob patterns. Fixed in v10.2.3+",
+    "tar": "Multiple CVEs (HIGH) - CVE-2026-23745 (file overwrite/symlink poisoning), CVE-2026-23950 (Unicode path collision), CVE-2026-24842 (path traversal), CVE-2026-26960 (arbitrary file read/write). Fixed in v7.5.8+"
   }
 }
