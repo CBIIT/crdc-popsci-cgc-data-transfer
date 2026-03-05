@@ -77,7 +77,6 @@ jobs:
         exit-code: '${{ env.TRIVY_EXIT_CODE }}'
         ignore-unfixed: true
         severity: 'MEDIUM,HIGH,CRITICAL'
-        skip-files: "/usr/src/app/package.json,/usr/src/app/package-lock.json"
 
     - name: AWS OIDC Authentication
       uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
