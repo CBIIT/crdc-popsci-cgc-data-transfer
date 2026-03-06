@@ -37,7 +37,8 @@
     "fast-xml-parser": "^5.3.8",
     "glob": "^11.1.0",
     "minimatch": "^10.2.3",
-    "tar": "^7.5.8"
+    "tar": "^7.5.10",
+    "test-exclude": "^7.0.2"
   },
   "comments": {
     "overrides": "Security vulnerability fixes for transitive dependencies",
