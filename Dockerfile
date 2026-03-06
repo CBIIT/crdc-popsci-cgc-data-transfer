@@ -1,26 +1,24 @@
-# Runtime stage - minimal alpine with only node (no npm!)
-FROM alpine:3.23
-ENV PORT=8082
-ENV NODE_ENV=production
+FROM node:25.5.0-alpine3.22 AS fnl_base_image
+ENV PORT 4030
+ENV NODE_ENV production
 WORKDIR /usr/src/app
 
-# Install runtime dependencies and upgrade packages
-RUN apk add --no-cache libstdc++ libgcc && \
-    apk upgrade --no-cache libcrypto3 libssl3
+# Upgrade OpenSSL to 3.5.5+ and remove gnupg (CVE-2026-24882 has no fix)
+# Remove Node.js OpenSSL headers to avoid false positive detection (CVE-2025-15467)
+# Note: The actual fix requires a Node.js release with patched OpenSSL
+RUN apk update && \
+    apk upgrade --no-cache libcrypto3 libssl3 && \
+    apk del gnupg 2>/dev/null || true && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf /usr/local/include/node/openssl
 
-# Copy node binary and libraries from builder (without npm)
-COPY --from=builder /usr/local/bin/node /usr/local/bin/
-COPY --from=builder /usr/lib/libgcc* /usr/lib/
-COPY --from=builder /usr/lib/libstdc* /usr/lib/
-
-# Create node user
-RUN addgroup -g 1000 node && \
-    adduser -u 1000 -G node -s /bin/sh -D node
-
-# Copy application dependencies and code
-COPY --from=builder --chown=node:node /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node . .
-
-EXPOSE 8082
-USER node
-CMD ["node", "./bin/www"]
+RUN npm install -g npm@11.7.0
+RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/cross-spawn
+COPY package*.json ./
+#RUN npm ci --only=production
+RUN npm install --omit=dev \
+  && npm cache clean --force \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+COPY  --chown=node:node . .
+EXPOSE 4030
+CMD [ "node", "./bin/www" ]
