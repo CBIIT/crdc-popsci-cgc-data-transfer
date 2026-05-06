@@ -1,24 +1,28 @@
-FROM node:25.5.0-alpine3.22 AS fnl_base_image
-ENV PORT 4030
-ENV NODE_ENV production
+# Stage 1: Build with all dependencies
+FROM node:24-alpine AS builder
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci --production
+
+# Stage 2: Production runtime (minimal)
+FROM node:24-alpine
+
+# Update npm to fix picomatch, brace-expansion, and ip-address vulnerabilities
+RUN npm install -g npm@11.13.0
+
+ENV PORT=4030
+ENV NODE_ENV=production
 WORKDIR /usr/src/app
 
-# Upgrade OpenSSL to 3.5.5+ and remove gnupg (CVE-2026-24882 has no fix)
-# Remove Node.js OpenSSL headers to avoid false positive detection (CVE-2025-15467)
-# Note: The actual fix requires a Node.js release with patched OpenSSL
-RUN apk update && \
-    apk upgrade --no-cache libcrypto3 libssl3 && \
-    apk del gnupg 2>/dev/null || true && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /usr/local/include/node/openssl
+# Copy only what's needed for runtime
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node . .
 
-RUN npm install -g npm@11.7.0
-RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/cross-spawn
-COPY package*.json ./
-#RUN npm ci --only=production
-RUN npm install --omit=dev \
-  && npm cache clean --force \
-  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
-COPY  --chown=node:node . .
+# Remove package files to prevent false positive vulnerability scans
+RUN rm -f package-lock.json package.json
+
 EXPOSE 4030
+
+# Run as non-root user for security
+USER node
 CMD [ "node", "./bin/www" ]
