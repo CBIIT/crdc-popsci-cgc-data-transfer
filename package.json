@@ -1,6 +1,6 @@
 {
   "name": "crdc-popsci-cgc-data-transfer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This microservice supports interoperability between the Population Science Data Commons(PSDC) and Cancer Genomics Cloud (CGC) to enable secure sharing of file manifest data.",
   "main": "index.js",
   "scripts": {
