@@ -3,11 +3,11 @@ ENV PORT 4030
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 
-# Upgrade OpenSSL to 3.5.5+ and remove gnupg (CVE-2026-24882 has no fix)
+# Upgrade OpenSSL to 3.5.7-r0 and remove gnupg (CVE-2026-24882 has no fix)
 # Remove Node.js OpenSSL headers to avoid false positive detection (CVE-2025-15467)
 # Note: The actual fix requires a Node.js release with patched OpenSSL
 RUN apk update && \
-    apk upgrade --no-cache libcrypto3 libssl3 && \
+    apk upgrade --no-cache libcrypto3=3.5.7-r0 libssl3=3.5.7-r0 && \
     apk del gnupg 2>/dev/null || true && \
     rm -rf /var/cache/apk/* && \
     rm -rf /usr/local/include/node/openssl
