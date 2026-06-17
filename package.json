@@ -34,17 +34,23 @@
     "supertest": "^7.1.4"
   },
   "overrides": {
-    "fast-xml-parser": "^5.3.8",
+    "fast-xml-builder": "^1.1.7",
+    "fast-xml-parser": "^5.7.0",
     "glob": "^11.1.0",
     "minimatch": "^10.2.3",
+    "path-to-regexp": "^0.1.13",
+    "qs": "^6.15.2",
     "tar": "^7.5.10",
     "test-exclude": "^7.0.2"
   },
   "comments": {
     "overrides": "Security vulnerability fixes for transitive dependencies",
-    "fast-xml-parser": "CVE-2026-27942 (CVSS 6.9) - Buffer Overflow vulnerability in XMLBuilder when preserveOrder:true is set. Transitive dependency from @aws-sdk/client-s3 -> @aws-sdk/xml-builder. Fixed in v5.3.8+",
+    "fast-xml-builder": "CVE-2026-44665 - vulnerability in fast-xml-builder. Transitive dep of fast-xml-parser. Fixed in v1.1.7+",
+    "fast-xml-parser": "CVE-2026-27942 (CVSS 6.9) - Buffer Overflow in XMLBuilder. CVE-2026-33036, CVE-2026-33349 (fixed v5.5.6/5.5.7), CVE-2026-41650 (fixed v5.7.0). Transitive dep from @aws-sdk/client-s3. Fixed in v5.7.0+",
     "glob": "CVE-2025-64756 (HIGH) - Command Injection vulnerability via malicious filenames. Fixed in v11.1.0+",
     "minimatch": "Multiple CVEs (HIGH) - CVE-2026-26996, CVE-2026-27903, CVE-2026-27904: Denial of Service via specially crafted glob patterns. Fixed in v10.2.3+",
+    "path-to-regexp": "CVE-2026-4867 - vulnerability in path-to-regexp 0.1.x. Transitive dep from express. Fixed in v0.1.13",
+    "qs": "CVE-2026-8723 - vulnerability in qs. Transitive dep from express, body-parser. Fixed in v6.15.2",
     "tar": "Multiple CVEs (HIGH) - CVE-2026-23745 (file overwrite/symlink poisoning), CVE-2026-23950 (Unicode path collision), CVE-2026-24842 (path traversal), CVE-2026-26960 (arbitrary file read/write), GHSA-qffp-2rhf-9h96 (hardlink path traversal). Fixed in v7.5.10+"
   }
 }
