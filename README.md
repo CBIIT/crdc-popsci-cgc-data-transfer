@@ -1,120 +1,80 @@
-# crdc-ctdc-interoperation
+# Population Science Data Commons CGC Data Transfer Service
+[![Coverage Status](https://coveralls.io/repos/github/CBIIT/crdc-popsci-cgc-data-transfer/badge.svg)](https://coveralls.io/github/CBIIT/crdc-popsci-cgc-data-transfer)
 
-This microservice supports interoperability between the CTDC and other nodes in the CRDC via publicly-available APIs. It identifies CTDC-relevant data in the CRDC nodes, maps the data to corresponding CTDC studies and provides an API for the CTDC front-end to retrieve information about the available data, including how to access it. Currently, the microservice searches for and returns relevant image collection data from the IDC and TCIA CRDC nodes; however, with minor updates, the number of CRDC nodes examined can easily be expanded as the need arises.
+## Purpose
 
-&nbsp;
+This microservice supports interoperability between the Population Science Data Commons (PSDC) and Cancer Genomics Cloud (CGC) to enable secure sharing of file manifest data. It acts as a bridge service that:
 
-## Interoperation process overview
+- **Receives manifest data** - Accepts CSV manifest files containing file metadata/listings from PSDC
+- **Stores manifests in S3** - Uploads the manifest to an AWS S3 bucket with a unique filename
+- **Generates time-limited signed URLs** - Creates CloudFront signed URLs that allow secure, temporary access to the manifest files
+- **Returns access URLs** - Provides the signed URL back to the caller for secure file retrieval
 
-![Interoperation Sequence Diagram](./doc/sequence_diagram.png)
 
-&nbsp;
+## Main Endpoint
 
-## Data available from CRDC nodes
+**POST** `/get-manifest-file-signed-url`
+- Accepts manifest CSV data in request body
+- Returns a time-limited signed URL for secure access
+- URL expires after the configured duration (`SIGNED_URL_EXPIRY_SECONDS`)
 
-| CRDC Node |                                                    Response data fields                                                    |
-| :-------: | :------------------------------------------------------------------------------------------------------------------------: |
-|    IDC    | collection_id, cancer_type, date_updated, description, doi, image_types, location, species, subject_count, supporting_data |
-|   TCIA    |                Collection, total_patientIDs, unique_modalities, unique_bodypartsExamined, total_imageCounts                |
-
-&nbsp;
-
-## Usage
-
-### Example query:
-
-```
-{
-    getAllStudies {
-        study_id
-        study_short_name
-        associated_links {
-            associated_link_name,
-            associated_link_url,
-            metadata {
-                
-                ... on IDCMetadata {
-                    collection_id,
-                    cancer_type,
-                    date_updated,
-                    description,
-                    doi,
-                    image_types,
-                    location,
-                    species,
-                    subject_count,
-                    supporting_data
-                }
-                ... on TCIAMetadata {
-                    Collection,
-                    Aggregate_PatientID,
-                    Aggregate_Modality,
-                    Aggregate_BodyPartExamined,
-                    Aggregate_ImageCount,
-                    Aggregate_ImageBool
-                }
-            }
-        },
-       image_collection_count
-    }
-}
-```
+This enables PSDC to share file manifests with CGC without exposing S3 credentials or requiring direct bucket access.
 
 &nbsp;
 
-### Example response:
+## Requirements
 
-```
-{
-    "data": {
-        "getAllStudies": [
-            {
-                "study_id": "NCT04314401",
-                "study_short_name": "CMB",
-                "associated_links": [
-                    {
-                        "associated_link_name": "IDC",
-                        "associated_link_url": "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=cmb_ov",
-                        "metadata": {
-                            "collection_id": "cmb_ov",
-                            "cancer_type": "Ovarian Cancer",
-                            "date_updated": "2024-11-26",
-                            "description": "The Cancer Moonshot Biobank [https://moonshotbiobank.cancer.gov/] is a National Cancer Institute initiative to support current and future investigations into drug resistance and sensitivity and other NCI-sponsored cancer research initiatives, with an aim of improving researchers'' understanding of cancer and how to intervene in cancer initiation and progression. During the course of this study, biospecimens (blood and tissue removed during medical procedures) and associated data will be collected longitudinally from at least 1000 patients across at least 10 cancer types, who represent the demographic diversity of the U.S. and receiving standard of care cancer treatment [https://www.cancer.gov/publications/dictionaries/cancer-terms/def/standard-of-care] at multiple NCI Community Oncology Research Program (NCORP) [https://ncorp.cancer.gov/] sites.\n\nThis collection contains de-identified histopathology imaging procured from subjects in NCI’s Cancer Moonshot Biobank-Ovarian Carcinoma Cancer (CMB-OV) cohort. Associated genomic, phenotypic and clinical data will be hosted by The Database of Genotypes and Phenotypes (dbGaP) [https://www.ncbi.nlm.nih.gov/gap/] and other NCI databases.\n\n13993796\n\nPlease see the CMB-OV: DICOM converted Slide Microscopy images for the Cancer Moonshot Biobank initiative Ovarian Cancer collection page to learn more about the pathology images and to obtain any supporting metadata for this collection.\n\n",
-                            "doi": "10.5281/zenodo.13993796",
-                            "image_types": "SM",
-                            "location": "Ovary",
-                            "species": "Human",
-                            "subject_count": 14,
-                            "supporting_data": "Clinical"
-                        }
-                    },
-                    {
-                        "url": "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=CTDC",
-                        "repository": "TCIA",
-                        "metadata": {
-                            "Collection": "CTDC",
-                            "total_patient_IDs": 57,
-                            "unique_modalities": [
-                                "MR"
-                            ],
-                            "unique_bodyparts_examined": [
-                                "HEAD"
-                            ],
-                            "total_image_counts": 17797
-                        }
-                    }
-                ],
-               "image_collection_count": 12
-            }
-        ]
-    }
-}
+### System Requirements
+- **Node.js**: v22
+
+### AWS Requirements
+- AWS Account with:
+  - S3 bucket for manifest file storage
+  - CloudFront distribution configured with the S3 bucket
+  - CloudFront key pair for signed URL generation
+  - IAM credentials with S3 PutObject permissions
+
+### Required Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Application
+VERSION=1.0.0
+DATE=2025-12-30
+
+# Bento Backend
+BENTO_BACKEND_GRAPHQL_URI=<your-bento-backend-graphql-uri>
+
+# AWS Configuration
+AWS_REGION=<aws-region>
+S3_ACCESS_KEY_ID=<your-s3-access-key>
+S3_SECRET_ACCESS_KEY=<your-s3-secret-key>
+FILE_MANIFEST_BUCKET_NAME=<your-s3-bucket-name>
+
+# CloudFront Configuration
+CLOUDFRONT_KEY_PAIR_ID=<your-cloudfront-key-pair-id>
+CLOUDFRONT_PRIVATE_KEY=<your-cloudfront-private-key>
+CLOUDFRONT_DOMAIN=<your-cloudfront-domain>
+SIGNED_URL_EXPIRY_SECONDS=3600
 ```
 
-&nbsp;
+### Installation & Running
 
-## Environment variables
+```bash
+# Install dependencies
+npm install
 
-    - BENTO_BACKEND_GRAPHQL_URI: Bento backend URI for GraphQL POST requests
-    - REDIS_HOST: Redis cache host
-    - REDIS_PORT: Redis cache port
+# Start the application
+npm start
+
+# Run in debug mode
+npm run debug
+
+# Run tests
+npm test
+npm run test:ci
+
+# Run tests with coverage
+npm run test:coverage
+```
