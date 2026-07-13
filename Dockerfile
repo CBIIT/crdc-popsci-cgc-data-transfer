@@ -1,24 +1,24 @@
-FROM node:25.5.0-alpine3.22 AS fnl_base_image
-ENV PORT 4030
-ENV NODE_ENV production
+FROM node:24-alpine3.23 AS fnl_base_image
+
+ENV PORT=4030
+ENV NODE_ENV=production
 WORKDIR /usr/src/app
 
-# Upgrade OpenSSL to 3.5.5+ and remove gnupg (CVE-2026-24882 has no fix)
-# Remove Node.js OpenSSL headers to avoid false positive detection (CVE-2025-15467)
-# Note: The actual fix requires a Node.js release with patched OpenSSL
-RUN apk update && \
-    apk upgrade --no-cache libcrypto3 libssl3 && \
-    apk del gnupg 2>/dev/null || true && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /usr/local/include/node/openssl
-
-RUN npm install -g npm@11.7.0
-RUN rm -rf /usr/local/lib/node_modules/npm/node_modules/cross-spawn
+# Copy package files first (better caching)
 COPY package*.json ./
-#RUN npm ci --only=production
-RUN npm install --omit=dev \
+
+# Install dependencies, then remove npm (not needed at runtime)
+RUN npm ci --omit=dev --ignore-scripts \
   && npm cache clean --force \
-  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
-COPY  --chown=node:node . .
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+  && apk add --no-cache su-exec
+
+# Copy application code
+COPY --chown=node:node . .
+
 EXPOSE 4030
+
+COPY conf/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 CMD [ "node", "./bin/www" ]
