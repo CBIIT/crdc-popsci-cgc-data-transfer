@@ -64,14 +64,14 @@ jobs:
       run: |
         docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
 
-    - name: Set Trivy exit code
-      run: |
-        if  [[ ${{ inputs.fail_on_cve_scan }} == true ]];
-        then
-          echo 'CVE_EXIT_CODE=1' >> $GITHUB_ENV
-        else
-          echo 'CVE_EXIT_CODE=0' >> $GITHUB_ENV
-        fi
+    # - name: Set CVE exit code
+    #   run: |
+    #     if  [[ ${{ inputs.fail_on_cve_scan }} == true ]];
+    #     then
+    #       echo 'CVE_EXIT_CODE=1' >> $GITHUB_ENV
+    #     else
+    #       echo 'CVE_EXIT_CODE=0' >> $GITHUB_ENV
+    #     fi
 
     # - name: Run Trivy vulnerability scanner
     #   id: trivy-scan
