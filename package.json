@@ -1,12 +1,12 @@
 {
   "name": "crdc-popsci-cgc-data-transfer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This microservice supports interoperability between the Population Science Data Commons(PSDC) and Cancer Genomics Cloud (CGC) to enable secure sharing of file manifest data.",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon ./bin/www",
+    "devStart": "node --watch ./bin/www",
     "start": "node ./bin/www",
-    "debug": "./node_modules/.bin/nodemon --inspect ./bin/www",
+    "debug": "node --inspect --watch ./bin/www",
     "test": "NODE_ENV=test jest",
     "test:ci": "TZ=UTC CI=true jest --passWithNoTests --coverage --maxWorkers=2",
     "test:coverage": "NODE_ENV=test jest --coverage"
@@ -24,17 +24,17 @@
     "graphql": "^15.8.0",
     "graphql-http": "^1.21.0",
     "html-to-text": "^9.0.4",
-    "morgan": "^1.12.0",
+    "morgan": "^1.12.1",
     "node-fetch": "^2.6.7",
     "redis": "^4.6.5"
   },
   "devDependencies": {
     "jest": "^30.3.0",
-    "nodemon": "^3.1.14",
     "supertest": "^7.1.4"
   },
   "overrides": {
     "qs": "^6.16.0",
-    "body-parser": "^1.20.6"
+    "body-parser": "^1.20.6",
+    "test-exclude": "^8.0.0"
   }
 }
