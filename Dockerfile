@@ -14,6 +14,7 @@ RUN npm ci --omit=dev --ignore-scripts \
   && apk add --no-cache --upgrade \
   libcrypto3 \
   libssl3 \
+  zlib \
   su-exec
 
 # Copy application code
