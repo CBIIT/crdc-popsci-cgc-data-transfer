@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts \
   && npm cache clean --force \
   && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
-  && apk add --no-cache su-exec
+  && apk add --no-cache su-exec 'zlib=1.3.2-r1'
 
 # Copy application code
 COPY --chown=node:node . .
