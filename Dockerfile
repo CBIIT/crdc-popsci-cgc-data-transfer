@@ -11,7 +11,11 @@ COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts \
   && npm cache clean --force \
   && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
-  && apk add --no-cache su-exec
+  && apk add --no-cache --upgrade \
+  libcrypto3 \
+  libssl3 \
+  zlib \
+  su-exec
 
 # Copy application code
 COPY --chown=node:node . .
