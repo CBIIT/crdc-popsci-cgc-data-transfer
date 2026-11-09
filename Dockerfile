@@ -12,9 +12,11 @@ RUN npm ci --omit=dev --ignore-scripts \
   && npm cache clean --force \
   && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
   && apk add --no-cache --upgrade \
+  musl=1.2.5-r24 \
+  musl-utils=1.2.5-r24 \
   libcrypto3 \
   libssl3 \
-  zlib \
+  zlib=1.4-r0 \
   su-exec
 
 # Copy application code
